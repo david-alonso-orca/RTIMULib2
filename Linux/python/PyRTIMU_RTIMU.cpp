@@ -188,18 +188,33 @@ static PyMethodDef RTIMU_RTIMU_methods[] = {
     //////// getIMUData
     {"getIMUData", (PyCFunction)([] (PyObject *self, PyObject* args) -> PyObject* {
         const RTIMU_DATA& data = ((RTIMU_RTIMU*)self)->val->getIMUData();
-        return Py_BuildValue("{s:K,s:O,s:(d,d,d),s:O,s:(d,d,d,d),s:O,s:(d,d,d),s:O,s:(d,d,d),s:O,s:(d,d,d)}",
+
+        PyObject* pyFusionPoseValid = PyBool_FromLong(data.fusionPoseValid);
+        PyObject* pyFusionQPoseValid = PyBool_FromLong(data.fusionQPoseValid);
+        PyObject* pyGyroValid = PyBool_FromLong(data.gyroValid);
+        PyObject* pyAccelValid = PyBool_FromLong(data.accelValid);
+        PyObject* pyCompassValid = PyBool_FromLong(data.compassValid);
+
+        PyObject* result = Py_BuildValue("{s:K,s:O,s:(d,d,d),s:O,s:(d,d,d,d),s:O,s:(d,d,d),s:O,s:(d,d,d),s:O,s:(d,d,d)}",
                  "timestamp", data.timestamp,
-                 "fusionPoseValid", PyBool_FromLong(data.fusionPoseValid),
+                 "fusionPoseValid", pyFusionPoseValid,
                  "fusionPose", data.fusionPose.x(), data.fusionPose.y(), data.fusionPose.z(),
-                 "fusionQPoseValid", PyBool_FromLong(data.fusionQPoseValid),
+                 "fusionQPoseValid", pyFusionQPoseValid,
                  "fusionQPose", data.fusionQPose.scalar(), data.fusionQPose.x(), data.fusionQPose.y(), data.fusionQPose.z(),
-                 "gyroValid", PyBool_FromLong(data.gyroValid),
+                 "gyroValid", pyGyroValid,
                  "gyro", data.gyro.x(), data.gyro.y(), data.gyro.z(),
-                 "accelValid", PyBool_FromLong(data.accelValid),
+                 "accelValid", pyAccelValid,
                  "accel", data.accel.x(), data.accel.y(), data.accel.z(),
-                 "compassValid", PyBool_FromLong(data.compassValid),
+                 "compassValid", pyCompassValid,
                  "compass", data.compass.x(), data.compass.y(), data.compass.z());
+
+        Py_DECREF(pyFusionPoseValid);
+        Py_DECREF(pyFusionQPoseValid);
+        Py_DECREF(pyGyroValid);
+        Py_DECREF(pyAccelValid);
+        Py_DECREF(pyCompassValid);
+
+        return result;
 /*
                  "pressure", data.pressureValid ? PyFloat_FromDouble(data.pressure):Py_None,
                  "temperature", data.temperatureValid ? PyFloat_FromDouble(data.temperature):Py_None,
