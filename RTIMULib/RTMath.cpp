@@ -22,6 +22,7 @@
 //  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "RTMath.h"
+#include <algorithm>
 #ifdef WIN32
 #include <qdatetime.h>
 #endif
@@ -387,7 +388,9 @@ void RTQuaternion::toEuler(RTVector3& vec)
     vec.setX(atan2(2.0 * (m_data[2] * m_data[3] + m_data[0] * m_data[1]),
             1 - 2.0 * (m_data[1] * m_data[1] + m_data[2] * m_data[2])));
 
-    vec.setY(asin(2.0 * (m_data[0] * m_data[2] - m_data[1] * m_data[3])));
+    RTFLOAT sinp = 2.0 * (m_data[0] * m_data[2] - m_data[1] * m_data[3]);
+    sinp = std::clamp(sinp, -1.0f, 1.0f);
+    vec.setY(asin(sinp));
 
     vec.setZ(atan2(2.0 * (m_data[1] * m_data[2] + m_data[0] * m_data[3]),
             1 - 2.0 * (m_data[2] * m_data[2] + m_data[3] * m_data[3])));
