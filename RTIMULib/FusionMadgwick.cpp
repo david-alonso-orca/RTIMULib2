@@ -119,6 +119,7 @@ void FusionMadgwick::newIMUData(RTIMU_DATA& data, const RTIMUSettings *settings)
 //=====================================================================================================
 
 #include <math.h>
+#include <stdint.h>
 
 
 //---------------------------------------------------------------------------------------------------
@@ -306,11 +307,12 @@ void FusionMadgwick::MadgwickAHRSupdateIMU(float gx, float gy, float gz, float a
 // See: http://en.wikipedia.org/wiki/Fast_inverse_square_root
 
 static float invSqrt(float x) {
-	float halfx = 0.5f * x;
-	float y = x;
-	long i = *(long*)&y;
-	i = 0x5f3759df - (i>>1);
-	y = *(float*)&i;
-	y = y * (1.5f - (halfx * y * y));
-	return y;
+        float halfx = 0.5f * x;
+        float y;
+        union { float f; int32_t i; } conv;
+        conv.f = x;
+        conv.i = 0x5f3759df - (conv.i >> 1);
+        y = conv.f;
+        y = y * (1.5f - (halfx * y * y));
+        return y;
 }
